@@ -11,7 +11,7 @@ import {
   ArrowLeft, Lock, Info, Fingerprint, Activity, ChevronRight, CreditCard, Cpu, Bell, Shield
 } from 'lucide-react';
 import { CitizenProfile, EnrollmentRecord } from '../types';
-import { CONGO_PROVINCES, ENROLLMENT_CENTERS } from '../data/mockData';
+import { CONGO_PROVINCES, CONGO_PROVINCES_GEOGRAPHY, ENROLLMENT_CENTERS } from '../data/mockData';
 
 interface CitizenPortalProps {
   onPreEnrollCompleted: (newRecord: EnrollmentRecord) => void;
@@ -39,6 +39,9 @@ export default function CitizenPortal({
     birthDate: '',
     birthPlace: '',
     originProvince: 'Kinshasa',
+    originChefLieu: 'Kinshasa',
+    originTerritoire: 'Nsele',
+    originVillage: 'Kinkole',
     currentAddress: '',
     currentCity: '',
     currentProvince: 'Kinshasa',
@@ -175,11 +178,33 @@ export default function CitizenPortal({
     const { name, value } = e.target;
     setFormData(prev => {
       const updated = { ...prev, [name]: value };
+      
       // Reset center if province changes
       if (name === 'currentProvince') {
         const provinceCenters = ENROLLMENT_CENTERS[value] || [];
         updated.appointmentCenter = provinceCenters[0] || '';
       }
+      
+      // Proportional geographic hierarchy update for originProvince
+      if (name === 'originProvince') {
+        const geo = CONGO_PROVINCES_GEOGRAPHY[value];
+        if (geo) {
+          updated.originChefLieu = geo.chefLieu;
+          updated.originTerritoire = geo.territoires[0] || '';
+          const territoryVillages = geo.villages[updated.originTerritoire] || [];
+          updated.originVillage = territoryVillages[0] || '';
+        }
+      }
+      
+      // Proportional update for originTerritoire
+      if (name === 'originTerritoire') {
+        const geo = CONGO_PROVINCES_GEOGRAPHY[prev.originProvince];
+        if (geo) {
+          const territoryVillages = geo.villages[value] || [];
+          updated.originVillage = territoryVillages[0] || '';
+        }
+      }
+      
       return updated;
     });
 
@@ -415,7 +440,7 @@ export default function CitizenPortal({
       doc.setFontSize(9);
       doc.setFont("Helvetica", "normal");
 
-      const fields = [
+       const fields = [
         { label: "NOM", value: receipt.citizen.lastName, isBold: true },
         { label: "POSTNOM", value: receipt.citizen.postName || "-", isBold: true },
         { label: "PRÉNOM", value: receipt.citizen.firstName, isBold: true },
@@ -423,6 +448,9 @@ export default function CitizenPortal({
         { label: "NÉ(E) LE", value: new Date(receipt.citizen.birthDate).toLocaleDateString('fr-FR'), isBold: false },
         { label: "LIEU DE NAISSANCE", value: receipt.citizen.birthPlace, isBold: false },
         { label: "PROVINCE D'ORIGINE", value: receipt.citizen.originProvince, isBold: false },
+        { label: "CHEF-LIEU D'ORIGINE", value: receipt.citizen.originChefLieu || "-", isBold: false },
+        { label: "TERRITOIRE D'ORIGINE", value: receipt.citizen.originTerritoire || "-", isBold: false },
+        { label: "VILLAGE D'ORIGINE", value: receipt.citizen.originVillage || "-", isBold: false },
         { label: "ADRESSE DOMICILE", value: receipt.citizen.currentAddress, isBold: false },
         { label: "VILLE / COMMUNE", value: receipt.citizen.currentCity, isBold: false },
         { label: "PROVINCE DE RÉSIDENCE", value: receipt.citizen.currentProvince, isBold: false },
@@ -431,7 +459,7 @@ export default function CitizenPortal({
         { label: "DOCUMENT FOURNI", value: receipt.citizen.justificationDoc.replace('_', ' '), isBold: false }
       ];
 
-      let currentY = 83;
+      let currentY = 81;
       const startX = 54;
       const labelW = 42;
       const valueX = startX + labelW;
@@ -440,7 +468,7 @@ export default function CitizenPortal({
         // Draw background stripe for odd rows for premium legibility
         if (idx % 2 === 1) {
           doc.setFillColor(248, 250, 252);
-          doc.rect(startX - 2, currentY - 3, 141, 4.5, 'F');
+          doc.rect(startX - 2, currentY - 2.8, 141, 4.0, 'F');
         }
 
         doc.setFont("Helvetica", "normal");
@@ -455,7 +483,7 @@ export default function CitizenPortal({
         }
         doc.text(String(field.value), valueX, currentY);
 
-        currentY += 4.5;
+        currentY += 4.0;
       });
 
       // -------------------------------------------------------------
@@ -616,6 +644,9 @@ export default function CitizenPortal({
       birthDate: formData.birthDate,
       birthPlace: formData.birthPlace,
       originProvince: formData.originProvince,
+      originChefLieu: formData.originChefLieu,
+      originTerritoire: formData.originTerritoire,
+      originVillage: formData.originVillage,
       currentAddress: formData.currentAddress,
       currentCity: formData.currentCity,
       currentProvince: formData.currentProvince,
@@ -1361,6 +1392,49 @@ export default function CitizenPortal({
                 </div>
 
                 <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1">Chef-lieu d'Origine (Automatique)</label>
+                  <div className="relative">
+                    <MapPin className="absolute left-3 top-3 w-4 h-4 text-gray-500" />
+                    <input
+                      type="text"
+                      name="originChefLieu"
+                      readOnly
+                      placeholder="Chef-lieu d'origine"
+                      value={formData.originChefLieu || CONGO_PROVINCES_GEOGRAPHY[formData.originProvince]?.chefLieu || ''}
+                      className="w-full bg-congo-dark/30 border border-gray-800 rounded-xl py-2.5 pl-10 pr-4 text-sm text-gray-400 cursor-not-allowed focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1">Territoire d'Origine <span className="text-congo-red">*</span></label>
+                  <select
+                    name="originTerritoire"
+                    value={formData.originTerritoire}
+                    onChange={handleInputChange}
+                    className="w-full bg-congo-dark/60 border border-gray-800 rounded-xl py-2.5 px-4 text-sm text-white focus:outline-none focus:border-congo-blue h-[42px]"
+                  >
+                    {(CONGO_PROVINCES_GEOGRAPHY[formData.originProvince]?.territoires || []).map(terr => (
+                      <option key={terr} value={terr}>{terr}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1">Village d'Origine <span className="text-congo-red">*</span></label>
+                  <select
+                    name="originVillage"
+                    value={formData.originVillage}
+                    onChange={handleInputChange}
+                    className="w-full bg-congo-dark/60 border border-gray-800 rounded-xl py-2.5 px-4 text-sm text-white focus:outline-none focus:border-congo-blue h-[42px]"
+                  >
+                    {(CONGO_PROVINCES_GEOGRAPHY[formData.originProvince]?.villages[formData.originTerritoire] || []).map(vil => (
+                      <option key={vil} value={vil}>{vil}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
                   <label className="block text-xs font-medium text-gray-400 mb-1">Province Actuelle <span className="text-congo-red">*</span></label>
                   <select
                     name="currentProvince"
@@ -1800,6 +1874,24 @@ export default function CitizenPortal({
                         <span className="text-gray-400 font-mono">PROV ORIGINE :</span>
                         <span className="col-span-2 text-gray-800">{receipt.citizen.originProvince}</span>
                       </div>
+                      {receipt.citizen.originChefLieu && (
+                        <div className="grid grid-cols-3">
+                          <span className="text-gray-400 font-mono font-bold">CHEF-LIEU :</span>
+                          <span className="col-span-2 text-gray-800">{receipt.citizen.originChefLieu}</span>
+                        </div>
+                      )}
+                      {receipt.citizen.originTerritoire && (
+                        <div className="grid grid-cols-3">
+                          <span className="text-gray-400 font-mono font-bold">TERRITOIRE :</span>
+                          <span className="col-span-2 text-gray-800">{receipt.citizen.originTerritoire}</span>
+                        </div>
+                      )}
+                      {receipt.citizen.originVillage && (
+                        <div className="grid grid-cols-3">
+                          <span className="text-gray-400 font-mono font-bold">VILLAGE :</span>
+                          <span className="col-span-2 text-gray-800">{receipt.citizen.originVillage}</span>
+                        </div>
+                      )}
                       <div className="grid grid-cols-3">
                         <span className="text-gray-400 font-mono">DOMICILE :</span>
                         <span className="col-span-2 text-gray-800">{receipt.citizen.currentAddress}, {receipt.citizen.currentCity}</span>
@@ -1889,6 +1981,9 @@ export default function CitizenPortal({
                       birthDate: '',
                       birthPlace: '',
                       originProvince: 'Kinshasa',
+                      originChefLieu: 'Kinshasa',
+                      originTerritoire: 'Nsele',
+                      originVillage: 'Kinkole',
                       currentAddress: '',
                       currentCity: '',
                       currentProvince: 'Kinshasa',
@@ -1919,6 +2014,9 @@ export default function CitizenPortal({
                       birthDate: '',
                       birthPlace: '',
                       originProvince: 'Kinshasa',
+                      originChefLieu: 'Kinshasa',
+                      originTerritoire: 'Nsele',
+                      originVillage: 'Kinkole',
                       currentAddress: '',
                       currentCity: '',
                       currentProvince: 'Kinshasa',

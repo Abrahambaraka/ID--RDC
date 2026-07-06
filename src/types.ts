@@ -12,6 +12,9 @@ export interface CitizenProfile {
   birthDate: string;
   birthPlace: string;
   originProvince: string;
+  originChefLieu?: string;
+  originTerritoire?: string;
+  originVillage?: string;
   currentAddress: string;
   currentCity: string;
   currentProvince: string;
