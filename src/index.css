@@ -1,0 +1,201 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --color-congo-blue: #007FFF;
+  --color-congo-gold: #FFD700;
+  --color-congo-red: #CE1126;
+  --color-congo-dark: #E9EBF0;
+  --color-congo-card: #FFFFFF;
+  --color-congo-panel: #F4F5F7;
+}
+
+/* -------------------------------------------------------------
+   GRAPHIC CHARTER GLOBAL STYLE OVERRIDES (LIGHT SILK THEME)
+   ------------------------------------------------------------- */
+
+/* Page Background & Grid Pattern (faint silver-gray dots) */
+body, .bg-congo-dark {
+  background-color: #E9EBF0 !important;
+  background-image: radial-gradient(#cbd5e1 1.2px, transparent 1.2px) !important;
+  background-size: 24px 24px !important;
+  color: #1A1C1E !important;
+}
+
+/* Rounded Card Overrides (Mockup style) */
+.bg-congo-card, [class*="bg-congo-card"] {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+}
+
+/* Border Overrides (Map dark borders to soft gray) */
+.border-gray-800, 
+.border-gray-700, 
+.border-gray-900, 
+.border-white\/10, 
+.border-white\/5, 
+.border-congo-blue\/20, 
+.border-congo-blue\/10 {
+  border-color: #DFE2E6 !important;
+}
+
+/* Inputs, Textareas and Selects overrides */
+input, select, textarea, .bg-congo-dark\/40, .bg-congo-dark\/60 {
+  background-color: #F4F5F7 !important;
+  border-color: #DFE2E6 !important;
+  color: #1A1C1E !important;
+}
+
+/* Custom validation error styles to override general input styles */
+input.input-error, select.input-error, textarea.input-error {
+  border-color: #CE1126 !important;
+  background-color: #FFF5F5 !important;
+}
+
+input.input-error:focus, select.input-error:focus, textarea.input-error:focus {
+  border-color: #CE1126 !important;
+  box-shadow: 0 0 0 2px rgba(206, 17, 38, 0.15) !important;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #007FFF !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(0, 127, 255, 0.15) !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #9CA3AF !important;
+}
+
+/* Form Option elements */
+option {
+  background-color: #FFFFFF !important;
+  color: #1A1C1E !important;
+}
+
+/* Text Colors Overrides (Map white/light gray to dark charcoal) */
+.text-white:not(
+  button, button *, 
+  .bg-congo-blue *, .bg-congo-blue,
+  .bg-congo-red *, .bg-congo-red,
+  .bg-emerald-500 *, .bg-emerald-600 *,
+  .bg-gradient-to-r *, .bg-gradient-to-tr *,
+  .text-white-force, .bg-slate-900 *,
+  .bg-[#007FFF] *, .bg-[#CE1126] *,
+  .bg-[#1A1C1E] *
+) {
+  color: #1A1C1E !important;
+}
+
+/* Ensure gold text is readable on white backgrounds by mapping it to a premium bronze/amber shade */
+.text-congo-gold:not(
+  .bg-congo-blue *, .bg-congo-red *,
+  .bg-[#1A1C1E] *, button *, .text-white-force
+) {
+  color: #B45309 !important; /* Rich amber/bronze */
+}
+
+/* Map red text to a beautiful readable crimson */
+.text-congo-red:not(
+  .bg-[#1A1C1E] *, button *, .text-white-force
+) {
+  color: #CE1126 !important;
+}
+
+.text-gray-100, .text-gray-200, .text-gray-300 {
+  color: #1F2937 !important;
+}
+
+.text-gray-400 {
+  color: #4B5563 !important;
+}
+
+.text-gray-500 {
+  color: #6B7280 !important;
+}
+
+/* Sub-panels gradients */
+.bg-gradient-to-r, .bg-gradient-to-br {
+  background-image: none !important;
+  background-color: #FFFFFF !important;
+}
+
+/* Exclude Congo colored stripes from background-image overrides */
+.bg-gradient-to-r[class*="from-congo-blue"] {
+  background-image: linear-gradient(to right, #007FFF, #FFD700, #CE1126) !important;
+}
+
+/* Core Brand Stripes Accent Line */
+.brand-stripes {
+  height: 4px;
+  width: 100%;
+  background: linear-gradient(90deg, #007FFF 0%, #007FFF 50%, #FFD700 50%, #FFD700 70%, #CE1126 70%, #CE1126 100%);
+}
+
+/* Custom styles for animations and card styling */
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Hide scrollbars but keep functionality */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Shimmer effect for biometric scan */
+@keyframes shimmer {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+.animate-scan {
+  animation: scan 2s linear infinite;
+}
+
+@keyframes scan {
+  0%, 100% { transform: translateY(0%); }
+  50% { transform: translateY(100%); }
+}
+
+/* Custom bento animation and layout styles from template */
+.security-pulse {
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.5; }
+  50% { transform: scale(1.05); opacity: 0.2; }
+  100% { transform: scale(0.95); opacity: 0.5; }
+}
+
+.bento-card {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s;
+}
+.bento-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px -5px rgba(0, 90, 183, 0.08), 0 8px 16px -6px rgba(0, 90, 183, 0.05);
+}
+
+.flow-line {
+  background: linear-gradient(90deg, #005ab7 0%, #007FFF 50%, #FFD700 100%) !important;
+  background-size: 200% 100% !important;
+  animation: flow-animation 2s linear infinite !important;
+}
+@keyframes flow-animation {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+

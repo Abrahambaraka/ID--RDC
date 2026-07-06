@@ -1,0 +1,6 @@
+{
+  "name": "ID-RDC",
+  "description": "Plateforme unifiée d'identification civile (ONIP) et d'enrôlement électoral (CENI) biométrique en République Démocratique du Congo.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
